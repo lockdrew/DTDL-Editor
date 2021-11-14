@@ -39,7 +39,6 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { ObjectSchemaComponent } from './object-schema/object-schema.component';
 import { ObjectSchemaEditorComponent } from './object-schema-editor/object-schema-editor.component';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { IdNameHeaderComponentComponent } from './id-name-header-component/id-name-header-component.component';
 import { IdNameHeaderComponent } from './id-name-header-component/id-name-header-component';
 import { SettingsComponent } from './settings/settings.component';
 import { SuccessSnackbarComponent } from './success-snackbar/success-snackbar.component';
@@ -61,7 +60,6 @@ import { SuccessSnackbarComponent } from './success-snackbar/success-snackbar.co
     ErrorSnackbarComponent,
     ObjectSchemaComponent,
     ObjectSchemaEditorComponent,
-    IdNameHeaderComponentComponent,
     IdNameHeaderComponent,    
     SettingsComponent, 
     SuccessSnackbarComponent
