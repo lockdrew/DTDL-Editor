@@ -12,8 +12,7 @@ import { ValidationService } from '../services/validation/validation-service.ser
   styleUrls: ['./file-select.component.scss']
 })
 export class FolderSelectComponent implements OnInit {
-  @ViewChild("fileInput") fileInput!: ElementRef;
-  
+  @ViewChild("fileInput") fileInput!: ElementRef;  
   public editorService: EditorService;
   public fileService: FileService;
   private _formBuilder: FormBuilder;
@@ -30,7 +29,7 @@ export class FolderSelectComponent implements OnInit {
 
   uploadFiles(file: any) {
     this.fileService.uploadFiles(file).subscribe((capability: InterfaceCapabilityModel) => { 
-      console.log("Loaded file '%s'.", capability.name);
+      console.log("Loaded file '%s'.", capability.displayName);
       var formControl = new InterfaceCapabilityFormControl(capability, this._formBuilder, this._validationService);
       this.editorService.addInterface(formControl);
     });

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -6,5 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   public title: string = 'DTDL Editor';
-  public navOpenState = true;
+  public menuOpenState = true;
+  public navOpenState = false;
+  public treeView = false;
+
+  constructor() { }
 }

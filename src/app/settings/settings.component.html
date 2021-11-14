@@ -1,0 +1,11 @@
+<div class="content-container">
+    <h1>Settings</h1>
+    <mat-divider></mat-divider>
+    <br/>
+    <mat-form-field color="accent">
+        <mat-label for="baseDtmi">Base DTMI</mat-label>
+        <input matInput id="baseDtmi" type="text" [formControl]="baseDtmi" />
+    </mat-form-field>
+    <br/>
+    <button mat-raised-button color="primary" class="browse-button" (click)="save()">Save</button>
+</div>

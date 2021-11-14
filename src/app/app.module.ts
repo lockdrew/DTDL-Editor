@@ -21,7 +21,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule, MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-
 import { MainEditorComponent } from './main-editor/main-editor.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PreviewPanelComponent } from './preview-panel/preview-panel.component';
@@ -41,6 +40,9 @@ import { ObjectSchemaComponent } from './object-schema/object-schema.component';
 import { ObjectSchemaEditorComponent } from './object-schema-editor/object-schema-editor.component';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { IdNameHeaderComponentComponent } from './id-name-header-component/id-name-header-component.component';
+import { IdNameHeaderComponent } from './id-name-header-component/id-name-header-component';
+import { SettingsComponent } from './settings/settings.component';
+import { SuccessSnackbarComponent } from './success-snackbar/success-snackbar.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +61,10 @@ import { IdNameHeaderComponentComponent } from './id-name-header-component/id-na
     ErrorSnackbarComponent,
     ObjectSchemaComponent,
     ObjectSchemaEditorComponent,
-    IdNameHeaderComponentComponent
+    IdNameHeaderComponentComponent,
+    IdNameHeaderComponent,    
+    SettingsComponent, 
+    SuccessSnackbarComponent
   ],
   imports: [
     BrowserModule,
@@ -87,7 +92,9 @@ import { IdNameHeaderComponentComponent } from './id-name-header-component/id-na
     MatSlideToggleModule
   ],
   entryComponents: [
-    ObjectSchemaEditorComponent
+    ObjectSchemaEditorComponent,
+    FolderSelectComponent,
+    SettingsComponent
   ],
   providers: [
 		MatDialog,
