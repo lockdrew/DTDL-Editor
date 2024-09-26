@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FolderSelectComponent } from './file-select.component';
+import { FileSelectComponent } from './file-select.component';
 
 describe('FolderSelectComponent', () => {
-  let component: FolderSelectComponent;
-  let fixture: ComponentFixture<FolderSelectComponent>;
+  let component: FileSelectComponent;
+  let fixture: ComponentFixture<FileSelectComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FolderSelectComponent ]
+      declarations: [ FileSelectComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FolderSelectComponent);
+    fixture = TestBed.createComponent(FileSelectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

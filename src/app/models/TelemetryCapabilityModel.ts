@@ -1,31 +1,15 @@
-import 'reflect-metadata';
-import { jsonMember, jsonObject } from "typedjson";
+
 import { AbstractCapabilityModel } from './AbstractCapabilityModel';
+import { AbstractSchemaModel } from './AbstractSchemaModel';
 
-@jsonObject
 export class TelemetryCapabilityModel extends AbstractCapabilityModel {
-  @jsonMember({ name: '@id' })
-  public id!: string;
+  public name!: string;
 
-  @jsonMember({ name: '@type' })
-  public type: string = "Telemetry";
+  public schema!: string | AbstractSchemaModel; 
 
-  @jsonMember 
-  public  name!: string;
+  public unit!: string;
 
-  @jsonMember 
-  public displayName!: string;
-
-  @jsonMember 
-  public description!: string;
-
-  @jsonMember 
-  public comment!: string;
-
-  // Telemetry specific
-  @jsonMember 
-  public schema!: string;
-
-  @jsonMember 
-  public semanticType!: string;
+  constructor(id: string) {
+    super(id, "Telemetry");
+  }
 }

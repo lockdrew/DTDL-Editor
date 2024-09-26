@@ -1,31 +1,39 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ICapabilityModel } from '../models/ICapabilityModel';
-import { ICapabilityFormControl } from '../formControls/ICapabilityFormControl';
-import { EditorService } from '../services/editor/editor-service.service';
-import { ObjectSchemaEditorComponent } from '../object-schema-editor/object-schema-editor.component';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { EditorService } from '../services/editor/editor.service';
+import { ComponentCapabilityFormControl } from '../formControls/ComponentCapabilityFormControl';
+import { UntypedFormControl } from '@angular/forms';
 
 @Component({
   selector: 'component-definition',
   templateUrl: './component.component.html',
   styleUrls: ['./component.component.scss']
 })
-export class ComponentComponent implements OnInit {
+export class ComponentComponent implements OnInit, OnDestroy {
+  @Input() public interfaceId!: string;
   @Input() public formIndex!: [number, number];
-  @Input() public component!: ICapabilityFormControl<ICapabilityModel>;
+  @Input() public component!: ComponentCapabilityFormControl;
   @Input() public panelOpenState!: boolean;
+  private _editorService: EditorService;
 
-  constructor(public editorService: EditorService, public dialog: MatDialog) { 
-    
+  constructor(editorService: EditorService) {
+    this._editorService = editorService;
   }
-
+  
   public ngOnInit(): void { 
-    this.component.subscribeModelToForm();
+    this.component.subscribeModelToForm(this.component.form);
     this.syncHeaderFields();    
   }
 
+  public ngOnDestroy(): void {
+    this.component.unsubscribeModelFromForm();
+  }
+
+  public getFormControl(name: string): UntypedFormControl {
+    return this.component.form.get(name) as UntypedFormControl;
+  }
+
   public syncHeaderFields() {
-    const id = this.component.form.get("id");
+    const id = this.component.form.get("@id");
     const name = this.component.form.get("name");
 
     id?.valueChanges.subscribe(value => {      
@@ -37,17 +45,7 @@ export class ComponentComponent implements OnInit {
     });    
   }
 
-  public isObjectSchema() : boolean { 
-    return this.component.form.get("schema")?.value === "object"; 
-  }
-
-  openObjectSchemaEditor() {
-    const dialogRef = this.dialog.open(ObjectSchemaEditorComponent);
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.component.form.get("schema")?.setValue(result, { emitEvent: false });
-      }
-    });
+  public filterInterfacesForExtends(interfaceId: string): Array<string> {
+    return this._editorService.filterInterfacesForExtends(interfaceId);
   }
 }

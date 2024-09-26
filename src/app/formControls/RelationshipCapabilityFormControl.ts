@@ -1,62 +1,70 @@
-import { FormBuilder, FormGroup } from "@angular/forms";
-import { ICapabilityModel } from '../models/ICapabilityModel';
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { ICapabilityModel } from '../models/interfaces/ICapabilityModel';
 import { AbstractCapabilityFormControl } from './AbstractCapabilityFormControl';
 import { RelationshipCapabilityModel } from '../models/RelationshipCapabilityModel';
 import { PropertyCapabilityFormControl } from './PropertyCapabilityFormControl';
 import { ICapabilityFormControl } from './ICapabilityFormControl';
 import { PropertyCapabilityModel } from "../models/PropertyCapabilityModel";
 import { ValidationService } from "../services/validation/validation-service.service";
+import { InterfaceCapabilityFormControl } from "./InterfaceCapabilityFormControl";
+import { SchemaService } from "../services/schema/schema.service";
 
 export class RelationshipCapabilityFormControl extends AbstractCapabilityFormControl<RelationshipCapabilityModel> {
-  public properties: ICapabilityFormControl<ICapabilityModel>[];
-  
+  public properties: PropertyCapabilityFormControl[];
   private _validationService: ValidationService;
-  
-  constructor(model: RelationshipCapabilityModel, validationService: ValidationService, formBuilder: FormBuilder) {  
+  private _schemaService: SchemaService;
+
+  constructor(interfaceInstance: InterfaceCapabilityFormControl, model: RelationshipCapabilityModel, validationService: ValidationService, schemaService: SchemaService, formBuilder: UntypedFormBuilder) {
     super(formBuilder);
     this._validationService = validationService;
-    this.properties = new Array<PropertyCapabilityFormControl>();
-    this.mapModelSubProperties(model);
+    this._schemaService = schemaService;
     this.model = model;
-    this.form = this.toFormGroup();
+    this.form = this.toFormGroup(model);
+    this.properties = this.getPropertiesFormControls(model);
+    this.interface = interfaceInstance;
   }
-  
-  private mapModelSubProperties(model: RelationshipCapabilityModel): void {
+
+  public toFormGroup(model: RelationshipCapabilityModel): UntypedFormGroup {
+    let form = this.formBuilder.group({
+      "@id": [model["@id"], [this._validationService.validDtmi()]],
+      "@type": [model["@type"]],
+      displayName: [model.displayName],
+      comment: [model.comment],
+      description: [model.description],
+      // Relationship specific
+      name: [model.name],
+      minMultiplicity: [model.minMultiplicity],
+      maxMultiplicity: [model.maxMultiplicity],
+      target: [model.target],
+      writable: [model.writable]
+    });
+
+    return form;
+  }
+
+  private getPropertiesFormControls(model: RelationshipCapabilityModel): Array<PropertyCapabilityFormControl> {
+    let properties = new Array<PropertyCapabilityFormControl>();
+
     model.properties.map((capability: ICapabilityModel) => {
       let formControl!: ICapabilityFormControl<ICapabilityModel>;
-            
-      switch(capability.type) {
-        case "Property":          
-          formControl = new PropertyCapabilityFormControl(capability as PropertyCapabilityModel, this._validationService, this.formBuilder);
+
+      const type = capability["@type"][0].toLocaleLowerCase();
+    
+      switch (type) {
+        case "property":
+          formControl = new PropertyCapabilityFormControl(this.interface, capability as PropertyCapabilityModel, this._validationService, this._schemaService, this.formBuilder);
           break;
-        case "Command":          
-        case "Telemetry":          
-        case "Component":          
-        case "Relationship":          
+        case "command":
+        case "telemetry":
+        case "component":
+        case "relationship":
         default:
           break;
       }
 
-      this.properties.push(formControl);
-    });
-  }
-
-  public toFormGroup(): FormGroup {
-    let form = this.formBuilder.group({
-      id: [this.model.id, [this._validationService.ValidDtmi()]],
-      type: [this.model.type],
-      displayName: [this.model.displayName],
-      name: [this.model.name],
-      comment: [this.model.comment],
-      description: [this.model.description],
-      // Relationship specific
-      minMultiplicity: [this.model.minMultiplicity],
-      maxMultiplicity: [this.model.maxMultiplicity],
-      target: [this.model.target],
-      writable: [this.model.writable],
-      properties: this.formBuilder.array([...this.model.properties])
+      properties.push(<PropertyCapabilityFormControl>formControl);
     });
 
-    return form;
+    return properties;
   }
 }

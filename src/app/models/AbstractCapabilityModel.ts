@@ -1,27 +1,20 @@
-import { jsonMember, jsonObject } from "typedjson";
-import { ICapabilityModel } from "./ICapabilityModel";
 
-@jsonObject
-export class AbstractCapabilityModel implements ICapabilityModel {
-    @jsonMember({ name: '@id' })
-    public id!: string;
+import { ICapabilityModel } from "./interfaces/ICapabilityModel";
+import { LanguageMap } from './LanguageMap';
 
-    @jsonMember({ name: '@type' })
-    public type!: string;
+export abstract class AbstractCapabilityModel implements ICapabilityModel {
+    public "@id"!: string;
 
-    @jsonMember
-    public name!: string;
+    public "@type"!: string | Array<string>;
 
-    @jsonMember
-    public displayName!: string;
+    public displayName!: string | Array<LanguageMap>;
 
-    @jsonMember
-    public description!: string;
+    public description!: string | Array<LanguageMap>;
 
-    @jsonMember
     public comment!: string;
 
-    constructor(name: string) {
-        this.name = name;
+    constructor(id: string, type: string | Array<string>) {
+        this["@id"] = id;
+        this["@type"] = type;
     }
 }

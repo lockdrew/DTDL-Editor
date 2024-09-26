@@ -1,36 +1,17 @@
-import 'reflect-metadata';
-import { jsonMember, jsonObject } from "typedjson";
+
 import { AbstractCapabilityModel } from './AbstractCapabilityModel';
+import { CommandPayload } from './CommandPayload';
 
-@jsonObject
 export class CommandCapabilityModel extends AbstractCapabilityModel {
-  @jsonMember({ name: '@id' }) 
-  public id!: string;
-
-  @jsonMember({ name: '@type' })
-  public type: string = "Command";
-
-  @jsonMember 
   public name!: string;
 
-  @jsonMember 
-  public displayName!: string;
-
-  @jsonMember 
-  public description!: string;
-
-  @jsonMember 
-  public comment!: string;
-
-  // Command specific
-  @jsonMember 
   public commandType!: string;
 
-  // TODO: Implement Command request object
-  @jsonMember 
-  public request: any = {};
+  public request!: CommandPayload;
 
-  // TODO: Implement Command response object
-  @jsonMember 
-  public response: any = {};
+  public response!: CommandPayload;
+
+  constructor(id: string) {
+    super(id, "Command");
+  }
 }

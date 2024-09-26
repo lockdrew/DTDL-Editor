@@ -1,101 +1,86 @@
 <mat-expansion-panel    class="mat-elevation-z3"
-                        [expanded]="panelOpenState"                        
+                        [expanded]="panelOpenState"                                                
                         [formGroup]="interface.form"
+                        (opened)="open()"
+                        (closed)="close()"
                         [class.selected-panel]="false">
     <mat-expansion-panel-header>
-        <mat-panel-title>Interface Definition</mat-panel-title>
+        <mat-panel-title><strong>Interface</strong> &nbsp;<mat-divider [vertical]="true" class="vertical"></mat-divider>&nbsp; <em>{{parseNameFromDtmi(interface.model["@id"])}}</em></mat-panel-title>
         <mat-panel-description>Define a DTDL Model Interface</mat-panel-description>
     </mat-expansion-panel-header>
 
     <mat-form-field color="accent">
-        <mat-label for="context">Context</mat-label>
-        <input matInput id="context" type="text" formControlName="context" readonly />
+        <mat-label attr.for="interface_context_{{formIndex}}">Context</mat-label>
+        <mat-select matNativeControl id="interface_context_{{formIndex}}" formControlName="@context" multiple [compareWith]="editorService.compareContexts">
+          <mat-option *ngFor="let context of editorService.getContexts() | keyvalue" [value]="context.value"> {{ context.key }} </mat-option>
+      </mat-select>
     </mat-form-field>
+    <span class="formSpacer"></span>
+    <button mat-raised-button color="primary" (click)="addContext($event, interface)"><mat-icon>add_circle</mat-icon> Add Context</button>
     <br/>
 
     <mat-form-field color="accent">
-        <mat-label for="type">Type</mat-label>
-        <mat-select matNativeControl id="classType" formControlName="type">
-            <mat-option *ngFor="let type of editorService.classTypes" [value]="type"> {{ type }} </mat-option>
-        </mat-select>
+        <mat-label attr.for="interface_type_{{formIndex}}">Type</mat-label>
+        <input matInput id="interface_type_{{formIndex}}" type="text" formControlName="@type" readonly />        
     </mat-form-field>
     <span class="formSpacer"></span>
 
     <mat-form-field color="accent">
-        <mat-label for="id">Id</mat-label>
-        <input matInput id="id" type="text" formControlName="id" #interfaceId placeholder="dtmi:com:example:Thermostat;1" />
+        <mat-label attr.for="interface_id_{{formIndex}}">Id</mat-label>
+        <input matInput id="interface_id_{{formIndex}}" type="text" formControlName="@id" #interfaceId placeholder="dtmi:com:example:Thermostat;1" />
     </mat-form-field>
-    <span class="formSpacer"></span>  
+    <span class="formSpacer"></span> 
 
     <mat-form-field color="accent">
-        <mat-label for="comment">Comment</mat-label>
-        <input matInput id="comment" type="text" formControlName="comment" />
-    </mat-form-field>
-    <span class="formSpacer"></span>
-
-    <mat-form-field color="accent">
-        <mat-label for="description">Description</mat-label>
-        <input matInput id="description" type="text" formControlName="description" />
+      <mat-label attr.for="interface_extends_{{formIndex}}">Extends</mat-label>
+      <mat-select matNativeControl id="interface_extends_{{formIndex}}" formControlName="extends" multiple>
+          <mat-option *ngFor="let interfaceId of editorService.filterInterfacesForExtends(interfaceId.value)" [value]="interfaceId"> {{ interfaceId }} </mat-option>
+      </mat-select>
     </mat-form-field>
     <br/>
 
-    <mat-form-field color="accent">
-        <mat-label for="displayName">Display Name</mat-label>
-        <input matInput id="displayName" type="text" formControlName="displayName" />
-    </mat-form-field>
-    <span class="formSpacer"></span>
-
-    <mat-form-field color="accent">
-        <mat-label for="name">Name</mat-label>
-        <input matInput id="name" type="text" formControlName="name" />
-    </mat-form-field>
-    <span class="formSpacer"></span>
-
-    <mat-form-field color="accent">
-        <mat-label for="extends">Extends</mat-label>
-        <mat-select matNativeControl id="extends" formControlName="extends">
-            <mat-option *ngFor="let interfaceId of editorService.filterInterfacesForExtends(interfaceId.value)" [value]="interfaceId"> {{ interfaceId }} </mat-option>
-        </mat-select>
-    </mat-form-field>
-    <span class="formSpacer"></span>
-
+    <display-name-description [formIndex]="formIndex[1]" [parentFormGroup]="interface.form"></display-name-description>
     <br/>
+
+    <mat-form-field color="accent" style="width: 630px">
+        <mat-label attr.for="interface_comment_{{formIndex}}">Comment</mat-label>
+        <input matInput id="interface_comment_{{formIndex}}" type="text" formControlName="comment" />
+    </mat-form-field>
+    <br/>
+
     <mat-divider *ngIf="interface.contents.length > 0"></mat-divider>
     <br/>
 
-    <mat-card formArrayName="contents">
-        <mat-card-title>Capability List</mat-card-title>
+    <mat-card appearance="outlined" formArrayName="contents">
+        <mat-card-title><h3>Capabilities</h3></mat-card-title>
         <mat-card-content>
-            <mat-accordion>
-                <div *ngFor="let capability of getContents(); let i = index;" style="display: flex;">
-                    <ng-container [ngSwitch]="capability.model.type">
+            <mat-accordion class="flex-accordion">
+                <ng-container *ngFor="let capability of getContents(); let i = index;">
+                    <ng-container [ngSwitch]="getType(capability)">
                         <ng-container *ngSwitchCase="'Property'">
-                            <property-definition [property]="capability" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></property-definition>
+                            <property-definition class="flex-header" [property]="getProperty(capability)" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></property-definition>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Command'">
-                            <command-definition [command]="capability" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></command-definition>
+                            <command-definition class="flex-header" [command]="getCommand(capability)" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></command-definition>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Telemetry'">
-                            <telemetry-definition [telemetry]="capability" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></telemetry-definition>
+                            <telemetry-definition class="flex-header" [telemetry]="getTelemetry(capability)" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></telemetry-definition>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Component'">
-                            <component-definition [component]="capability" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></component-definition>
+                            <component-definition class="flex-header" [component]="getComponent(capability)" [interfaceId]="interfaceId.value" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></component-definition>
                         </ng-container>
                         <ng-container *ngSwitchCase="'Relationship'">
-                            <relationship-definition [relationship]="getRelationship(capability)" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></relationship-definition>
+                            <relationship-definition class="flex-header" [relationship]="getRelationship(capability)" [interfaceId]="interfaceId.value" [formIndex]="[formIndex[0], i]" [panelOpenState]="false"></relationship-definition>
                         </ng-container>
-                        <div class="action-row">
-                            <button mat-raised-button color="accent" class="action-button" (click)="delete($event, interface)"><mat-icon>delete_outline</mat-icon></button>
+                        <div class="flex-header-button" >
+                          <button mat-icon-button color="accent" (click)="delete($event, interface)"><mat-icon>cancel</mat-icon></button>
                         </div>
-                        <mat-divider></mat-divider>
+                        <mat-divider class="flex-divider"></mat-divider>
                     </ng-container>
-                </div>
+                </ng-container>
             </mat-accordion>
         </mat-card-content>
     </mat-card>
-
-    <br/>
-    <preview-panel [interface]="interface"></preview-panel>
 
     <mat-action-row>
         <button mat-raised-button color="primary" (click)="editorService.addPropertyToInterface(interface)">

@@ -1,30 +1,32 @@
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { AbstractCapabilityFormControl } from './AbstractCapabilityFormControl';
 import { CommandCapabilityModel } from '../models/CommandCapabilityModel';
 import { ValidationService } from "../services/validation/validation-service.service";
+import { InterfaceCapabilityFormControl } from "./InterfaceCapabilityFormControl";
 
 export class CommandCapabilityFormControl extends AbstractCapabilityFormControl<CommandCapabilityModel> {
   private _validationService: ValidationService;
   
-  constructor(model: CommandCapabilityModel, validationService: ValidationService, formBuilder: FormBuilder) {  
+  constructor(interfaceInstance: InterfaceCapabilityFormControl, model: CommandCapabilityModel, validationService: ValidationService, formBuilder: UntypedFormBuilder) {  
     super(formBuilder);
     this._validationService = validationService;
     this.model = model;
-    this.form = this.toFormGroup();
+    this.form = this.toFormGroup(model);
+    this.interface = interfaceInstance;
   }
     
-  public toFormGroup(): FormGroup {
+  public toFormGroup(model: CommandCapabilityModel): UntypedFormGroup {
     let form = this.formBuilder.group({
-      id: [this.model.id, [this._validationService.ValidDtmi()]],
-      type: [this.model.type],
-      displayName: [this.model.displayName],
-      name: [this.model.name],
-      comment: [this.model.comment],
-      description: [this.model.description],
+      "@id": [model["@id"], [this._validationService.validDtmi()]],
+      "@type": [model["@type"]],
+      displayName: [model.displayName],
+      comment: [model.comment],
+      description: [model.description],
       // Command specific
-      commandType: [this.model.commandType],
-      request: [this.model.request],
-      response: [this.model.response]
+      name: [model.name],
+      commandType: [model.commandType],
+      request: [model.request],
+      response: [model.response]
     });
 
     return form;

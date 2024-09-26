@@ -4,51 +4,30 @@
                         (closed)="panelOpenState = false"
                         [formGroup]="component.form">
     <mat-expansion-panel-header>
-        <mat-panel-title class="id-name-header-component"
-                [style.opacity]="panelOpenState ? '0' : '1'"
-                [style.visibility]="panelOpenState ? 'hidden' : 'visible'">
+        <mat-panel-title>
             <id-name-header-component               
                 [formIndex]="formIndex[1]"
-                [formGroup]="component.form"        
+                [formGroupControl]="component"                       
                 [panelOpenState]="panelOpenState">
             </id-name-header-component>
-        </mat-panel-title>
+        </mat-panel-title>        
     </mat-expansion-panel-header>
+    
+    <div class="formSpacer"></div>
 
-    <id-name-header-component
-        [style.opacity]="panelOpenState ? '1' : '0'"
-        [style.visibility]="panelOpenState ? 'visible' : 'hidden'"
-        [formIndex]="formIndex[1]"
-        [formGroup]="component.form"        
-        [panelOpenState]="panelOpenState">
-    </id-name-header-component>
+    <display-name-description [formIndex]="formIndex[1]" [parentFormGroup]="component.form"></display-name-description>
     <br/>
 
     <mat-form-field color="accent">
-        <mat-label attr.for="component_displayName_{{formIndex}}">Display Name</mat-label>
-        <input matInput id="component_displayName_{{formIndex}}" type="text" formControlName="displayName" />
+        <mat-label attr.for="component_schema_{{formIndex}}">Schema</mat-label>
+        <mat-select matNativeControl id="component_schema_{{formIndex}}" formControlName="schema">
+            <mat-option *ngFor="let interfaceId of filterInterfacesForExtends(interfaceId)" [value]="interfaceId"> {{ interfaceId }} </mat-option>
+        </mat-select>
     </mat-form-field>
     <span class="formSpacer"></span>
 
-    <mat-form-field color="accent">
-        <mat-label attr.for="component_description_{{formIndex}}">Description</mat-label>
-        <input matInput id="component_description_{{formIndex}}" type="text" formControlName="description" />
-    </mat-form-field>
-    <span class="formSpacer"></span>
-
-    <mat-form-field color="accent">
+    <mat-form-field color="accent" style="width: 420px">
         <mat-label attr.for="component_comment_{{formIndex}}">Comment</mat-label>
         <input matInput id="component_comment_{{formIndex}}" type="text" formControlName="comment" />
     </mat-form-field>
-    <br/>
-    
-    <mat-form-field appearance="fill" color="accent">
-        <mat-label attr.for="component_schema_{{formIndex}}">Schema</mat-label>
-        <mat-select matNativeControl id="component_schema_{{formIndex}}" formControlName="schema">
-            <mat-option *ngFor="let schema of editorService.schemaTypes" [value]="schema"> {{ schema }} </mat-option>
-        </mat-select>
-    </mat-form-field>
-    <ng-container *ngIf="isObjectSchema()">
-        <button mat-button (click)="openObjectSchemaEditor()">Edit</button>
-    </ng-container>
 </mat-expansion-panel>

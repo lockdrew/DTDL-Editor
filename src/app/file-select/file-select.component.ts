@@ -1,39 +1,60 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { InterfaceCapabilityModel } from '../models/InterfaceCapabilityModel';
-import { InterfaceCapabilityFormControl } from '../formControls/InterfaceCapabilityFormControl';
-import { EditorService } from '../services/editor/editor-service.service';
-import { FileService } from '../services/file/file-service.service';
-import { ValidationService } from '../services/validation/validation-service.service';
+import { FileService } from '../services/file/file.service';
 
 @Component({
   selector: 'file-select',
   templateUrl: './file-select.component.html',
   styleUrls: ['./file-select.component.scss']
 })
-export class FolderSelectComponent implements OnInit {
-  @ViewChild("fileInput") fileInput!: ElementRef;
-  
-  public editorService: EditorService;
+export class FileSelectComponent implements OnInit {
+  @Input() title!: string;
+  @Input() action!: string;
+  @Output() fileSelect = new EventEmitter<any>();
+  @ViewChild("fileInput") fileInput!: ElementRef;  
   public fileService: FileService;
-  private _formBuilder: FormBuilder;
-  private _validationService: ValidationService;
 
-  constructor(editorService: EditorService, fileService: FileService, formBuilder: FormBuilder, validationService: ValidationService) {
-    this.editorService = editorService;
-    this._validationService = validationService;
+  constructor(fileService: FileService) {
     this.fileService = fileService;
-    this._formBuilder = formBuilder;
   }
 
-  ngOnInit(): void {  }
+  public ngOnInit(): void {  }
 
-  uploadFiles(file: any) {
-    this.fileService.uploadFiles(file).subscribe((capability: InterfaceCapabilityModel) => { 
-      console.log("Loaded file '%s'.", capability.name);
-      var formControl = new InterfaceCapabilityFormControl(capability, this._formBuilder, this._validationService);
-      this.editorService.addInterface(formControl);
+  public executeAction(data: any): any {
+    let action = this.action.toLocaleLowerCase();
+    if (action === "import")
+      return this.importFiles(data);
+    else if (action  === "copy")
+      return this.copyFile(data);
+  }
+
+  public importFiles(file: any): void {
+    this.fileService.importFiles(file).subscribe((capability: InterfaceCapabilityModel) => { 
+      console.debug(`Loaded file '${capability.displayName}'.`);
+
+      if (!capability) {
+        console.error("Error loading file.");
+        return;
+      }
+      
+      this.fileSelect.emit(capability);
     });
+
+    this.fileInput.nativeElement.value = "";
+  }
+
+  public copyFile(file: any): void {
+    this.fileService.copyFile(file).subscribe((capability: any) => {
+      console.debug("Loaded JSON.");
+
+      if (!capability) {
+        console.error("Error loading file.");
+        return;
+      }
+
+      this.fileSelect.emit(capability);
+    });
+
     this.fileInput.nativeElement.value = "";
   }
 }

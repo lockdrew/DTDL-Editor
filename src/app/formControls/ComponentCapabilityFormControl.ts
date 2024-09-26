@@ -1,28 +1,30 @@
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { ComponentCapabilityModel } from '../models/ComponentCapabilityModel';
 import { ValidationService } from "../services/validation/validation-service.service";
 import { AbstractCapabilityFormControl } from './AbstractCapabilityFormControl';
+import { InterfaceCapabilityFormControl } from "./InterfaceCapabilityFormControl";
 
 export class ComponentCapabilityFormControl extends AbstractCapabilityFormControl<ComponentCapabilityModel>  {
   private _validationService: ValidationService;
   
-  constructor(model: ComponentCapabilityModel, validationService: ValidationService, formBuilder: FormBuilder) {  
+  constructor(interfaceInstance: InterfaceCapabilityFormControl, model: ComponentCapabilityModel, validationService: ValidationService, formBuilder: UntypedFormBuilder) {  
     super(formBuilder);
     this._validationService = validationService;
     this.model = model;
-    this.form = this.toFormGroup();
+    this.form = this.toFormGroup(model);
+    this.interface = interfaceInstance;
   }
   
-  public toFormGroup(): FormGroup {
+  public toFormGroup(model: ComponentCapabilityModel): UntypedFormGroup {
     let form = this.formBuilder.group({
-      id: [this.model.id, [this._validationService.ValidDtmi()]],
-      type: [this.model.type],
-      displayName: [this.model.displayName],
-      name: [this.model.name],
-      comment: [this.model.comment],
-      description: [this.model.description],
+      "@id": [model["@id"], [this._validationService.validDtmi()]],
+      "@type": [model["@type"]],
+      displayName: [model.displayName],
+      name: [model.name],
+      comment: [model.comment],
+      description: [model.description],
       // Component specific
-      schema: [this.model.schema]
+      schema: [model.schema]
     });
 
     return form;

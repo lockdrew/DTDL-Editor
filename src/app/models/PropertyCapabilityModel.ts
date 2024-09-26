@@ -1,34 +1,17 @@
-import 'reflect-metadata';
-import { jsonMember, jsonObject } from "typedjson";
+
 import { AbstractCapabilityModel } from './AbstractCapabilityModel';
+import { AbstractSchemaModel } from './AbstractSchemaModel';
 
-@jsonObject
-export class PropertyCapabilityModel extends AbstractCapabilityModel {
-  @jsonMember({ name: '@id' })
-  public id!: string;
-
-  @jsonMember({ name: '@type' })
-  public type: string = "Property";
-
-  @jsonMember 
+export class PropertyCapabilityModel extends AbstractCapabilityModel {  
   public name!: string;
 
-  @jsonMember 
-  public displayName!: string;
+  public schema!: string | AbstractSchemaModel; 
 
-  @jsonMember 
-  public description!: string;
+  public unit!: string;
 
-  @jsonMember 
-  public comment!: string;
-  
-  // Property specific
-  @jsonMember 
-  public schema!: string;
-
-  @jsonMember 
-  public semanticType!: string;
-
-  @jsonMember 
   public writable: boolean = false;
+
+  constructor(id: string) {
+    super(id, "Property");
+  }
 }

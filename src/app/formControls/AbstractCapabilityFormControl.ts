@@ -1,39 +1,52 @@
-import { FormArray, FormBuilder, FormGroup } from "@angular/forms";
-import { ICapabilityModel } from "../models/ICapabilityModel";
+import { AbstractControl, UntypedFormArray, UntypedFormBuilder, FormControl, UntypedFormGroup } from "@angular/forms";
+import { Subscription } from "rxjs";
+import { ICapabilityModel } from "../models/interfaces/ICapabilityModel";
 import { ICapabilityFormControl } from "./ICapabilityFormControl";
+import { InterfaceCapabilityFormControl } from "./InterfaceCapabilityFormControl";
+import { ISchemaModel } from "../models/interfaces/ISchemaModel";
 
-// TypedJSON requires a concrete type to work.
-export abstract class AbstractCapabilityFormControl<TCapabilityDto extends ICapabilityModel>
-    implements ICapabilityFormControl<TCapabilityDto>
+export abstract class AbstractCapabilityFormControl<TCapabilityModel extends ICapabilityModel | ISchemaModel>
+    implements ICapabilityFormControl<TCapabilityModel>
 {    
-    public formBuilder: FormBuilder;
-    public model!: TCapabilityDto;  
-    public form!: FormGroup;
+    public formBuilder: UntypedFormBuilder;
+    public model!: TCapabilityModel;  
+    public form!: UntypedFormGroup;
+    public interface!: InterfaceCapabilityFormControl;
+    private _subscriptions: Subscription[];
     
-    constructor(formBuilder: FormBuilder) {
-        this.formBuilder = formBuilder;        
+    // TODO: Move common services to the AbstractCapabilityFormControl base class
+    //       Currently, all subclasses have their own private instances of common services. E.g., `ValidationService`.
+    constructor(formBuilder: UntypedFormBuilder) {
+        this.formBuilder = formBuilder; 
+        this._subscriptions = new Array<Subscription>();       
     }
+  
+    public abstract toFormGroup(model: TCapabilityModel): UntypedFormGroup;
 
-    public abstract toFormGroup(): FormGroup;
-
-    public subscribeModelToForm(): void {
-      console.groupCollapsed("Creating Subscriptions");
-
-      Object.keys(this.form.controls).forEach(key => {        
-        console.debug(key);
-
-        let control = this.form.controls[key];        
+    public subscribeModelToForm(formGroup: UntypedFormGroup): void {
+      Object.keys(formGroup.controls).forEach(key => {        
+        let control = formGroup.controls[key];        
         
-        if(!(control instanceof FormArray)) {          
-          control.valueChanges.subscribe(
-            (value) => {
-              (<any>this.model)[key] = value;
-          }, (error: Error) => {
-              console.error("Error in subscription: %o", error);
-          });
+        if(control instanceof UntypedFormGroup) {
+          this.subscribeModelToForm(control);
+        } else if(!(control instanceof UntypedFormArray)) {          
+          this.createSubscription(control, key);
         }
       });
+    }
 
-      console.groupEnd();
+    private createSubscription(control: AbstractControl, key: string): void {
+      let subscription = control.valueChanges.subscribe(
+        (value) => {
+          (<any>this.model)[key] = value;
+      }, (error: Error) => {
+          console.error("Error in subscription: %o", error);
+      });
+      this._subscriptions.push(subscription);
+    }
+
+    public unsubscribeModelFromForm(): void {
+      console.debug(`Unsubscribing from ${this._subscriptions.length} subscriptions.`);
+      this._subscriptions.forEach((sub: Subscription) => sub.unsubscribe());
     }
 }

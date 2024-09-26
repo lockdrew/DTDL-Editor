@@ -4,60 +4,25 @@
                         (closed)="panelOpenState = false"
                         [formGroup]="telemetry.form">
     <mat-expansion-panel-header>
-        <mat-panel-title class="id-name-header-component"
-                [style.opacity]="panelOpenState ? '0' : '1'"
-                [style.visibility]="panelOpenState ? 'hidden' : 'visible'">
+        <mat-panel-title>
             <id-name-header-component               
                 [formIndex]="formIndex[1]"
-                [formGroup]="telemetry.form"        
-                [panelOpenState]="panelOpenState">
+                [formGroupControl]="telemetry"                       
+                [panelOpenState]="panelOpenState">getLo
             </id-name-header-component>
-        </mat-panel-title>
+        </mat-panel-title>        
     </mat-expansion-panel-header>
 
-    <id-name-header-component
-        [style.opacity]="panelOpenState ? '1' : '0'"
-        [style.visibility]="panelOpenState ? 'visible' : 'hidden'"
-        [formIndex]="formIndex[1]"
-        [formGroup]="telemetry.form"        
-        [panelOpenState]="panelOpenState">
-    </id-name-header-component>
+    <div class="formSpacer"></div>
+
+    <display-name-description [formIndex]="formIndex[1]" [parentFormGroup]="telemetry.form"></display-name-description>
     <br/>
 
-    <mat-form-field color="accent">
-        <mat-label attr.for="telemetry_displayName_{{formIndex}}">Display Name</mat-label>
-        <input matInput id="telemetry_displayName_{{formIndex}}" type="text" formControlName="displayName" />
-    </mat-form-field>
-    <span class="formSpacer"></span>
+    <schema-semantic-type-unit type="telemetry" [formIndex]="formIndex[1]" [parentForm]="telemetry"></schema-semantic-type-unit>
+    <br/>
 
-    <mat-form-field color="accent">
-        <mat-label attr.for="telemetry_description_{{formIndex}}">Description</mat-label>
-        <input matInput id="telemetry_description_{{formIndex}}" type="text" formControlName="description" />
-    </mat-form-field>
-    <span class="formSpacer"></span>
-
-    <mat-form-field color="accent">
+    <mat-form-field color="accent" style="width: 630px">
         <mat-label attr.for="telemetry_comment_{{formIndex}}">Comment</mat-label>
         <input matInput id="telemetry_comment_{{formIndex}}" type="text" formControlName="comment" />
     </mat-form-field>
-    <br/>
-
-    <mat-form-field color="accent">
-        <mat-label attr.for="telemetry_schema_{{formIndex}}">Schema</mat-label>
-        <mat-select matNativeControl id="telemetry_schema_{{formIndex}}" formControlName="schema">
-            <mat-option *ngFor="let schema of editorService.schemaTypes" [value]="schema"> {{ schema }} </mat-option>
-        </mat-select>
-    </mat-form-field>
-    <ng-container *ngIf="isObjectSchema()">
-        <button mat-raised-button color="primary" (click)="openObjectSchemaEditor()">Edit</button>
-    </ng-container>
-    <span class="formSpacer"></span>
-
-    <mat-form-field color="accent">
-        <mat-label attr.for="telemetry_semanticType_{{formIndex}}">Semantic Type</mat-label>
-        <mat-select matNativeControl id="telemetry_semanticType_{{formIndex}}" formControlName="semanticType">
-            <mat-option *ngFor="let semantic of editorService.semantics" [value]="semantic"> {{ semantic }} </mat-option>
-        </mat-select>
-    </mat-form-field>
-    <span class="formSpacer"></span>
 </mat-expansion-panel>

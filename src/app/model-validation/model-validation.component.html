@@ -1,0 +1,63 @@
+<div class="content-container">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Hints
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <mat-list role="list">
+      <h3 matListItemTitle><mat-icon matListItemIcon color="accent">info</mat-icon> When submitting multiple models you
+        must submit them as an array, e.g.: </h3>
+      <pre>{{ 
+'[ 
+  { "@id": "...model1" }, 
+  { "@id": "...model2" } 
+]' 
+    }}
+    </pre>
+      <h3 matListItemTitle><mat-icon matListItemIcon color="accent">info</mat-icon> Interfaces referenced by a Component
+        must be included in the model list:</h3>
+      <pre>{{ 
+'[ 
+  { "@type": "Component", "schema": "dtmi:example:myInterface;1" }, 
+  { "@id": "dtmi:example:myInterface;1", "@type": "Interface" } 
+]' 
+      }}
+      </pre>
+    </mat-list>
+
+  </mat-expansion-panel>
+  <br />
+
+  <h1>Click browse to open a file or paste your model's DTDL JSON-LD below.</h1>
+  <file-select action="Copy" (fileSelect)="copyFile($event)"></file-select>
+
+  <mat-form-field appearance="fill" style="width: 50%; height: 50%">
+    <textarea matInput #modelInput id="modelInput" rows="25" cols="100" cdkTextareaAutosize cdkAutosizeMinRows="25"
+      cdkAutosizeMaxRows="25" [ngModel]="fileData !== '' ? (fileData | json) : ''"></textarea>
+  </mat-form-field>
+  <br />
+
+  <button mat-raised-button color="primary" aria-hidden="false" aria-label="Validate"
+    (click)="validateModel(modelInput.value)">
+    <mat-icon>check_circle</mat-icon> Validate Model
+  </button>
+  <br />
+
+  <mat-card appearance="outlined" *ngIf="hasResults()">
+    <mat-list role="list" *ngFor="let value of validationResults">
+      <div>
+        <h3 matListItemTitle><mat-icon matListItemIcon color="warn"
+            style="margin-right: 10px">error_outline</mat-icon>{{value.cause}}</h3>
+        <h4 matListItemLine style="margin-left: 35px; margin-top: -15px"><b>Action:</b> {{value.action}}</h4>
+      </div>
+    </mat-list>
+  </mat-card>
+
+  <mat-card appearance="outlined" *ngIf="!hasResults()">
+    <div>
+      <h3><mat-icon matListItemIcon color="accent">check_circle</mat-icon> DTDL passed validation.</h3>
+    </div>
+  </mat-card>
+</div>

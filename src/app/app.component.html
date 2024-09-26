@@ -1,15 +1,43 @@
-<mat-toolbar>
-    <button type="button" mat-button (click)="nav.toggle()"><mat-icon>menu</mat-icon></button> 
-    <span class="toolbar-spacer"></span>   
-    <file-select></file-select>
-</mat-toolbar>
-<mat-sidenav-container>    
-    <mat-sidenav #nav mode="side" [opened]="navOpenState"
-                                  (opened)="navOpenState = true"
-                                  (closed)="navOpenState = false">
-        <model-tree></model-tree>
-    </mat-sidenav>
-    <mat-sidenav-content>        
-        <main-editor></main-editor>
-    </mat-sidenav-content>
-</mat-sidenav-container>
+<mat-drawer-container autosize fullscreen>
+  <mat-drawer #menu mode="side" disableClose="true" opened="menuOpenState">
+    <button mat-mini-fab (click)="menuOpenState = !menuOpenState" color="primary" style="margin: 10px;">
+      <mat-icon aria-label="Menu">menu</mat-icon>
+    </button>
+    <mat-nav-list>
+      <mat-list-item routerLink="/editor" routerLinkActive="active">
+        <mat-icon matListItemIcon>edit</mat-icon>
+        @if (menuOpenState) { <a>Main Editor</a> }
+      </mat-list-item>
+      <mat-list-item [routerLink]="[{ outlets: { sidenav: ['files'] } }]" (click)="shouldToggle('files') ? sidenav.toggle() : false" routerLinkActive="active">
+        <mat-icon matListItemIcon>folder</mat-icon>
+        @if (menuOpenState) { <a>Files</a> }
+      </mat-list-item>
+      <mat-list-item [routerLink]="[{ outlets: { sidenav: ['models'] } }]" (click)="shouldToggle('models') ? sidenav.toggle() : false" routerLinkActive="active">
+        <mat-icon matListItemIcon>list_alt</mat-icon>
+        @if (menuOpenState) { <a>Model Tree</a> }
+      </mat-list-item>
+      <mat-list-item routerLink="import" routerLinkActive="active">
+        <mat-icon matListItemIcon>import_export</mat-icon>
+        @if (menuOpenState) { <a>Import Model</a> }
+      </mat-list-item>
+      <mat-list-item routerLink="validate" routerLinkActive="active">
+        <mat-icon matListItemIcon>check</mat-icon>
+        @if (menuOpenState) { <a>Validate Model</a> }
+      </mat-list-item>
+      <mat-list-item routerLink="settings" routerLinkActive="active">
+        <mat-icon matListItemIcon>settings</mat-icon>
+        @if (menuOpenState) { <a>Settings</a> }
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-drawer>
+  <mat-drawer-content>
+    <mat-sidenav-container fullscreen>
+      <mat-sidenav #sidenav mode="side" [fixedInViewport]="false">
+        <router-outlet name="sidenav"></router-outlet>
+      </mat-sidenav>
+      <mat-sidenav-content [style.left]="sidenav.opened ? '.10%' : '0'">
+        <router-outlet></router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </mat-drawer-content>
+</mat-drawer-container>

@@ -1,10 +1,11 @@
-import { FormBuilder, FormGroup } from "@angular/forms";
-import { ICapabilityModel } from "../models/ICapabilityModel";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { ICapabilityModel } from "../models/interfaces/ICapabilityModel";
 
 export interface ICapabilityFormControl<TCapabilityModel extends ICapabilityModel> {
-    formBuilder: FormBuilder;
+    formBuilder: UntypedFormBuilder;
     model: TCapabilityModel;  
-    form: FormGroup;   
-    toFormGroup(): FormGroup;
-    subscribeModelToForm(): void;
+    form: UntypedFormGroup;   
+    toFormGroup(model: TCapabilityModel): UntypedFormGroup;
+    subscribeModelToForm(formGroup: UntypedFormGroup): void;
+    unsubscribeModelFromForm(): void;
 }

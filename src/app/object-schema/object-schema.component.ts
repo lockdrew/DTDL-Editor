@@ -1,45 +1,36 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ObjectSchemaFormControl } from '../formControls/ObjectSchemaFormControl';
-import { EditorService } from '../services/editor/editor-service.service';
-import { ObjectSchemaEditorService } from '../services/object-schema-editor/object-schema-editor.service';
+import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { SchemaService } from '../services/schema/schema.service';
+import { MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ObjectSchemaFormControl } from '../formControls/schemas/ObjectSchemaFormControl';
+import { FieldCapabilityFormControl } from '../formControls/FieldCapabilityFormControl';
+import { UntypedFormControl } from '@angular/forms';
 
 @Component({
   selector: 'object-schema',
   templateUrl: './object-schema.component.html',
   styleUrls: ['./object-schema.component.scss']
 })
-export class ObjectSchemaComponent implements OnInit {
-  @Input() public field!: ObjectSchemaFormControl;
-  public schemaObjectEditorService: ObjectSchemaEditorService; 
-  public editorService: EditorService;
+export class ObjectSchemaComponent implements OnInit, OnDestroy {
+  @Input()
+  public object!: ObjectSchemaFormControl;
+  public schemaService: SchemaService;
   public panelOpenState = true;
-  private maxLevel: number = 5; 
+  private MAX_LEVEL: number = 5;
+  public interfaceSchemaControl: UntypedFormControl = new UntypedFormControl();
 
-  constructor(schemaObjectEditorService: ObjectSchemaEditorService, editorSerivce: EditorService) { 
-    this.schemaObjectEditorService = schemaObjectEditorService; 
-    this.editorService = editorSerivce;
+  constructor(schemaService: SchemaService) { 
+    this.schemaService = schemaService; 
   }
 
-  ngOnInit(): void {
-    this.field.model.schema = "none"; 
-    this.field.subscribeModelToForm();
+  public ngOnInit(): void { 
+    this.object.subscribeModelToForm(this.object.form);
   }
 
-  public getFields() : Array<ObjectSchemaFormControl> { 
-    return this.field.fields
+  public ngOnDestroy(): void {
+    this.object.unsubscribeModelFromForm();
   }
 
-  public addChild() : void { 
-    this.schemaObjectEditorService.addChildField(this.field)
-  }
-
-  //DTDL Allows a nesting of objects down to five levels... 
-  //i.e. 4 children on the top level object. 
-  public canAddChild(): boolean { 
-    return this.field.model.level > this.maxLevel - 1; 
-  }
-
-  public valSelected(val: string) : void { 
-    this.field.model.schema = val; 
+  public getFields(): Array<FieldCapabilityFormControl> { 
+    return this.object.fields;
   }
 }

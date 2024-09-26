@@ -1,47 +1,22 @@
-import 'reflect-metadata';
-import { jsonArrayMember, jsonMember, jsonObject } from "typedjson";
-import { CustomDeserializerParams } from 'typedjson/lib/types/metadata';
+
 import { AbstractCapabilityModel } from './AbstractCapabilityModel';
-import { CommandCapabilityModel } from './CommandCapabilityModel';
-import { ComponentCapabilityModel } from './ComponentCapabilityModel';
-import { ICapabilityModel } from "./ICapabilityModel";
-import { PropertyCapabilityModel } from './PropertyCapabilityModel';
-import { RelationshipCapabilityModel } from './RelationshipCapabilityModel';
-import { TelemetryCapabilityModel } from './TelemetryCapabilityModel';
+import { ICapabilityModel } from "./interfaces/ICapabilityModel";
+import { AbstractSchemaModel } from './AbstractSchemaModel';
 
-@jsonObject
 export class InterfaceCapabilityModel extends AbstractCapabilityModel {
-  @jsonMember({ name: '@id' })
-  public id!: string;
+  public "@context": string | Array<string>;  
 
-  @jsonMember({ name: '@type' })
-  public type: string = "Interface";
+  public extends?: string | Array<string>;
 
-  @jsonMember
-  public name!: string;
+  public contents: Array<AbstractCapabilityModel>;
 
-  @jsonMember
-  public displayName!: string;
+  public schemas?: Array<AbstractSchemaModel>;
 
-  @jsonMember
-  public description!: string;
-  
-  @jsonMember
-  public comment!: string;
-
-  // Interface specific
-  @jsonMember({ name: '@context' })
-  public context: string = "dtmi:dtdl:context;2";  
-
-  @jsonMember
-  public extends!: string;
-
-  @jsonArrayMember(AbstractCapabilityModel, { deserializer: InterfaceCapabilityModel.interfaceCapabilityDeserializer } )
-  public contents: ICapabilityModel[];
-
-  constructor(name: string) {
-    super(name);
-    this.contents = new Array<ICapabilityModel>();
+  constructor(id: string, context: string | Array<string>) {
+    super(id, "Interface");
+    this["@context"] = context;
+    this.contents = new Array<AbstractCapabilityModel>();
+    this.schemas = new Array<AbstractSchemaModel>();
   }
 
   get commands(): ICapabilityModel[] {        
@@ -65,33 +40,7 @@ export class InterfaceCapabilityModel extends AbstractCapabilityModel {
   }
 
   private capabilityByType(type: string): ICapabilityModel[] {    
-    let capabilities = this.contents.filter(x => x.type === type);
+    let capabilities = this.contents.filter(x => x["@type"].indexOf(type) > -1);
     return capabilities;
-  }
-
-  public static interfaceCapabilityDeserializer(json: Array<any>, params: CustomDeserializerParams) {
-    let result = json.map((value: any) => {      
-      switch(value["@type"]) {
-        case "Property":          
-          return params.fallback(value, PropertyCapabilityModel);
-          break;
-        case "Command":
-          return params.fallback(value, CommandCapabilityModel);
-          break;
-        case "Telemetry":
-          return params.fallback(value, TelemetryCapabilityModel);
-          break;
-        case "Component":
-          return params.fallback(value, ComponentCapabilityModel);
-          break;
-        case "Relationship":
-          return params.fallback(value, RelationshipCapabilityModel);
-          break;
-        default:
-          break;          
-      }      
-    });
-
-    return result;
   }
 }
